@@ -21,10 +21,11 @@ void outputParams();																										// Create logfile.txt, containting
 int main() {
 
     try {
+        //Write paramaters to logfile - calls randomize function to determine seed
         outputParams();
-        for(int i = 0; i < 10; ++i){
-            simulate("Gomp+Gomp_simulation" + std::to_string(i));
-        }
+
+        //Simulate 10 times per parameter combination
+        simulate("Gomp+Gomp_simulation");
     }
 
     catch (std::exception &error) {
@@ -74,6 +75,7 @@ void iterate(std::string outputFileName, double parameter, std::vector<sheep> vH
     do {
         gen1Total = gen2Total = gen3Total = Damage1Alive = Damage2Alive = Damage1Dead = Damage2Dead = 0.0;
         iAlive = iDead = 0;
+#pragma omp parallel for schedule(dynamic) shared(iDead, iAlive, gen1Total, gen2Total, gen3Total, Damage1Alive, Damage2Alive, Damage1Dead, Damage2Dead)
         for (size_t i = 0; i < vHerd.size(); ++i) {				// Iterate over each sheep in population
             if (vHerd[i].isAlive()) {							// If alive..
                 vHerd[i].addDamage();							// Add random small amount of damage
@@ -120,6 +122,7 @@ void reproduceSheep(std::vector<sheep> &generation, const double &alfa) {
     std::vector<double> offspring(popSize);
     std::vector<int> deadSheep;
 
+#pragma omp parallel for schedule(dynamic)
     for (size_t i = 0; i < generation.size(); ++i) {	// Determine number of offspring for each individual
         double tmp = generation[i].getOffspringResources();
         double dOffspring = (maxOffspring * tmp) / (alfa + tmp);
@@ -133,6 +136,7 @@ void reproduceSheep(std::vector<sheep> &generation, const double &alfa) {
             deadSheep.push_back(i);
     }
 
+#pragma omp parallel for schedule(dynamic)
     for (size_t j = 0; j < deadSheep.size(); ++j) {
         int parent = rindex(offspring);					// Pick parent using weighted lottery
 
@@ -163,11 +167,12 @@ void simulate(const std::string &fileName) {
     multipleGenerations << "Generation," << "NrAlive," << "AgeAlive," << "Gen1," << "Gen2," << "Gen 3," << "Damage1," << "Damage2,"
                         << "Gen1Dead," << "Gen2Dead," << "Gen3Dead," << "Damage1Dead," << "Damage2Dead," << "NrDead," << "AgeDead" << std::endl;
 
-    std::ofstream individualData("Individual_Data" + fileName + ".csv");
+    std::ofstream individualData("Individual_Data_" + fileName + ".csv");
     individualData << "Generation," << "Alive," << "Age," << "Damage1," << "Damage2," << "Gen1," << "Gen2," << "Gen 3," << "DeathCause" << std::endl;
 
     do {
         iDead = iAlive = 0, dGen1 = dGen2 = dGen3 = dDeadgen1 = dDeadgen2 = dDeadGen3 = dDamage1 = dDamage2 = dDamage1Dead = dDamage2Dead = dAgeDead = dAgeAlive = 0.0;
+#pragma omp parallel for schedule(dynamic)
         for (size_t i = 0; i < vHerd.size(); ++i) {
             vHerd[i].addDamage();			// Add damage to sheep..
             vHerd[i].kill();				// .. and kill accordingly
@@ -176,6 +181,7 @@ void simulate(const std::string &fileName) {
             }
         }
         if (iTime % 50 == 0) {				// Every fiftieth generation, gather statistics:
+#pragma omp parallel for schedule(dynamic) shared(iDead, iAlive, dGen1, dGen2, dGen3, dDeadgen1, dDeadgen2, dDeadGen3, dDamage1, dDamage2, dDamage1Dead, dDamage2Dead, dAgeDead, dAgeAlive)
             for (size_t i = 0; i < vHerd.size(); ++i) {
                 if (!vHerd[i].isAlive()) {							// If dead, collect info:
                     ++iDead;										// Gather number of dead indivuals
