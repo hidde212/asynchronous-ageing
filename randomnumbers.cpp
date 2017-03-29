@@ -2,13 +2,20 @@
 #include <chrono>
 #include <random>
 #include "randomnumbers.h"
+#include "globals.h"
 
 std::mt19937 rng;
 
 long randomize() {
-    static std::random_device rd{};
-    auto seed = rd();
-    std::cout << "Used seed: "<< seed << std::endl;
+	unsigned int seed;
+	if (staticseed == 0) {
+		static std::random_device rd{};
+		seed = rd();
+	}
+	else {
+		seed = staticseed;
+	}
+	std::cout << "Used seed: "<< seed << std::endl;
     rng.seed(seed);
     return seed;
 }

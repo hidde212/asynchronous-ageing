@@ -14,6 +14,7 @@ extern double rho1;                 // Factor (y-axis intersect) in Gompertz's l
 extern double rho2;                 // Factor (y-axis intersect) in Gompertz's law of mortality for damage of trait 2
 extern double phi;                  // Factor in linear mortality curve
 extern double baseDamage;           // Standard amount of damage added per timestep before allocation of repair/offspring resources
+extern int staticseed;				// Standard seed when set manually
 
 
 extern double gen1Mean;				// Mean for constructing genotype 1 from normal distribution
