@@ -1,10 +1,10 @@
 #include "globals.h"
 
 //Global variables
-unsigned long popSize = 5000;			// (Initial) generation size
+unsigned long popSize = 10000;			// (Initial) generation size
 double intDeathRate = 0.5;		    	// Chance to die (lower is higher survivability); intrinsic death rate.
 double extDeathRate = 0.0001;			// Fraction individuals who die each timestep, extrinsic death
-int maxGens = 150000;					// Maximum amount of generation allowed per simulation
+int maxGens = 50000;					// Maximum amount of generation allowed per simulation
 double maxOffspring = 3.0;				// Max number of offspring allowed per individual
 double alfa = 0.4;						// Conversion rate for dependency resources invested in offspring <-> actual offspring
 double beta1 = 2.0;			        	// Factor (steepness) in Gompertz's law of mortality for damage of trait 1
